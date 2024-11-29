@@ -9,13 +9,23 @@ const authApi = baseApi.injectEndpoints({
         body: userInfo,
       }),
     }),
-    // registerUser: builder.mutation({
-    //   query: (userInfo) => ({
-    //     url: "/auth/signup/",
-    //     method: "POST",
-    //     body: userInfo,
-    //   }),
-    // }),
+    loginUser: builder.mutation({
+      query: (userInfo) => ({
+        url: "auth/jwt/create/",
+        method: "POST",
+        body: userInfo,
+      }),
+    }),
+    activateUser: builder.mutation({
+      query: (activationToken) => ({
+        url: `auth/activate/${activationToken}/`,
+        method: "POST",
+      }),
+    }),
   }),
 });
-export const { useRegisterUserMutation } = authApi;
+export const {
+  useRegisterUserMutation,
+  useLoginUserMutation,
+  useActivateUserMutation,
+} = authApi;
