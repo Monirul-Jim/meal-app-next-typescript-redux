@@ -11,7 +11,7 @@ const Navbar = () => {
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-shrink-0">
             <Link href="/" className="text-white font-bold text-xl">
-              MySite
+              Our Mess
             </Link>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
