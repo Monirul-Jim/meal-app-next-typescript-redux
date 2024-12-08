@@ -16,10 +16,12 @@ const authApi = baseApi.injectEndpoints({
         body: userInfo,
       }),
     }),
+
     activateUser: builder.mutation({
-      query: (activationToken) => ({
-        url: `auth/activate/${activationToken}/`,
+      query: ({ uid, token }) => ({
+        url: `auth/users/activation/`,
         method: "POST",
+        body: { uid, token },
       }),
     }),
   }),

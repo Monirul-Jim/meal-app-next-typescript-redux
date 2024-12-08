@@ -1,6 +1,7 @@
 "use client";
 import { useRegisterUserMutation } from "@/redux/api/authApi";
 import Link from "next/link";
+
 import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
@@ -14,13 +15,14 @@ const Register: React.FC = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<RegisterFormInputs>();
-  const [registerUser, { data, isLoading, isSuccess, error }] =
+  const [registerUser, { isLoading, isSuccess, error }] =
     useRegisterUserMutation();
-  console.log(error?.data);
 
   const [showPassword, setShowPassword] = useState(false);
+  console.log(isSuccess);
 
   // Toggle the showPassword state
   const togglePasswordVisibility = () => {
@@ -30,6 +32,7 @@ const Register: React.FC = () => {
     try {
       await registerUser(formData).unwrap();
       alert("Registration successful!");
+      reset();
     } catch (err) {
       console.error(err);
     }
@@ -44,6 +47,18 @@ const Register: React.FC = () => {
         <p className="text-center text-gray-600 mb-6">
           Create an account to get started!
         </p>
+        {isSuccess && (
+          <div className="mt-8 p-6 border-2 border-green-500 rounded-lg bg-green-100">
+            <p className="text-lg font-semibold text-green-600 text-center">
+              Registration successful! You can now log in.
+            </p>
+            <p className="mt-2 text-sm text-gray-700 text-center">
+              Check your email and activate your account to start using the
+              application.
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Username Field */}
           <div>
@@ -203,12 +218,6 @@ const Register: React.FC = () => {
           </p>
         )}
 
-        {/* Success Message */}
-        {data && (
-          <p className="mt-4 text-sm text-green-500 text-center">
-            Registration successful! You can now log in.
-          </p>
-        )}
         <div className="mt-4 text-center">
           <Link
             href="/login"
