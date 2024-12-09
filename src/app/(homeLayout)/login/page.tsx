@@ -5,6 +5,9 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 import Link from "next/link";
 import { useState } from "react";
+import verifyToken from "@/lib/Providers/verifyToken";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/feature/auth/authSlice";
 interface LoginFormInputs {
   username: string;
   email: string;
@@ -12,22 +15,25 @@ interface LoginFormInputs {
 }
 
 const Login = () => {
+  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>();
-  const [loginUser, { data: isData, isLoading, error }] =
+  const [loginUser, { data: isData, isLoading, isSuccess, error }] =
     useLoginUserMutation();
   const [showPassword, setShowPassword] = useState(false);
-  console.log(error);
+  console.log(isSuccess);
   // Toggle the showPassword state
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
   const onSubmit: SubmitHandler<LoginFormInputs> = async (formData) => {
     try {
-      await loginUser(formData).unwrap();
+      const response = await loginUser(formData).unwrap();
+      const user = verifyToken(response.access);
+      dispatch(setUser({ user, token: response.access }));
       alert("Login successful!");
     } catch (err) {
       console.error(err);
