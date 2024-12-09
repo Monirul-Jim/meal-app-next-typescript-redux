@@ -1,5 +1,8 @@
 "use client";
-import { useRegisterUserMutation } from "@/redux/api/authApi";
+import {
+  useRegisterUserMutation,
+  useResendActivationEmailMutation,
+} from "@/redux/api/authApi";
 import Link from "next/link";
 
 import { useState } from "react";
@@ -15,26 +18,51 @@ const Register: React.FC = () => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<RegisterFormInputs>();
   const [registerUser, { isLoading, isSuccess, error }] =
     useRegisterUserMutation();
-
+  const [resendActivationEmail, { error: aError }] =
+    useResendActivationEmailMutation();
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null); // Store the registered email
   const [showPassword, setShowPassword] = useState(false);
-  console.log(isSuccess);
+  console.log(aError);
 
-  // Toggle the showPassword state
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
   const onSubmit: SubmitHandler<RegisterFormInputs> = async (formData) => {
     try {
       await registerUser(formData).unwrap();
+      setRegisteredEmail(formData.email); // Save the email for future use
+
       alert("Registration successful!");
-      reset();
+      // reset();
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleActivation = async () => {
+    if (!registeredEmail) {
+      alert("Please complete registration first.");
+      return;
+    }
+
+    console.log({ email: registeredEmail }, "registeredEmail"); // Log the email
+    // await resendActivationEmail({ email: registeredEmail.email }).unwrap();
+
+    try {
+      // Ensure the request body has the correct format
+      await resendActivationEmail({ email: registeredEmail }).unwrap();
+      alert("Activation email has been resent. Please check your inbox.");
+    } catch (err) {
+      console.error("Error during resendActivationEmail:", err);
+      alert(
+        err?.data?.message ||
+          err?.data?.email?.[0] ||
+          "Failed to resend activation email. Please try again."
+      );
     }
   };
 
@@ -47,6 +75,7 @@ const Register: React.FC = () => {
         <p className="text-center text-gray-600 mb-6">
           Create an account to get started!
         </p>
+
         {isSuccess && (
           <div className="mt-8 p-6 border-2 border-green-500 rounded-lg bg-green-100">
             <p className="text-lg font-semibold text-green-600 text-center">
@@ -56,6 +85,19 @@ const Register: React.FC = () => {
               Check your email and activate your account to start using the
               application.
             </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleActivation();
+              }}
+            >
+              <button
+                type="submit"
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              >
+                Resend Activation Email
+              </button>
+            </form>
           </div>
         )}
 

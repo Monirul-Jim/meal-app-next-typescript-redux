@@ -24,10 +24,18 @@ const authApi = baseApi.injectEndpoints({
         body: { uid, token },
       }),
     }),
+    resendActivationEmail: builder.mutation({
+      query: (data) => ({
+        url: "auth/users/resend_activation/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 export const {
   useRegisterUserMutation,
   useLoginUserMutation,
   useActivateUserMutation,
+  useResendActivationEmailMutation,
 } = authApi;
